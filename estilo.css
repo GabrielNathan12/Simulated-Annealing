@@ -1,5 +1,11 @@
-body{
+body {
     display: flex;
     justify-content: center;
-    aling-items: center;
+    align-items: center;
+    
+}
+
+#myChart {
+    max-width: 250px;
+    max-height: 250px;
 }
