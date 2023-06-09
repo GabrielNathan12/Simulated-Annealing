@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="estilo.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Simulated Annealing</title>
+</head>
+<body>
+    <canvas id="myChart"></canvas>
+
+    <script>
+      // Dados e configurações do gráfico
+      var data = {
+        labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio'],
+        datasets: [
+          {
+            label: 'Vendas',
+            data: [12, 19, 3, 5, 2],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 3,
+          },
+        ],
+      };
+  
+      var options = {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      };
+  
+      // Obter o elemento canvas
+      var canvas = document.getElementById('myChart');
+      var ctx = canvas.getContext('2d');
+  
+      // Criar o gráfico
+      var chart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: options,
+      });
+    </script>
+    
+    
+</body>
+</html>

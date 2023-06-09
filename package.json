@@ -1,0 +1,23 @@
+{
+  "name": "simulated-annealing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GabrielNathan12/Simulated-Annealing.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GabrielNathan12/Simulated-Annealing/issues"
+  },
+  "homepage": "https://github.com/GabrielNathan12/Simulated-Annealing#readme",
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "chart.js": "^4.3.0"
+  }
+}
