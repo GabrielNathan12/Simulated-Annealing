@@ -1,11 +1,9 @@
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+#myChart {
+    max-width: 350px;
+    max-height: 370px;
     
 }
 
-#myChart {
-    max-width: 250px;
-    max-height: 250px;
+#schoolbag {
+    margin: 20px;
 }
