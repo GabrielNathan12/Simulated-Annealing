@@ -1,86 +1,206 @@
-class Simulated{
-  
-  constructor(pesoMochila , qtdItens){
-    this.pesoMochila = pesoMochila;
-    this.qtdItens = qtdItens;
-  }
-  
-  preecherObjeto(){
-    const dadosItens = [];
-    for(let i = 0; i < this.qtdItens; i++){
-      const value = Math.floor(Math.random() * 10) + 1;
-      const p = Math.floor(Math.random() * 10) + 1;
-      
-      const dados = {
-        valor: value,
-        peso: p
-      }
-      dadosItens.push(dados);
-    }
-    return dadosItens;
+// Função para calcular o peso total de uma solução
+const tempIni = 100;
+const tempFinal = 0.1;
+const refrigeracao = 0.95;
+const limiteInte = 1000;
+
+function getItem(){
+  const qtdItens = document.getElementById('items').value;
+  // Transformando em inteiros
+  const Items = parseInt(qtdItens);
+
+  // Criacao do vetor de items
+  const items = [];
+
+  // Criacao dos items com valores e pesos aleatorios
+  for (let i = 0; i < Items; i++) {
+    const item = {
+      valor: Math.round(Math.random() * 10 + 1),
+      peso: Math.round(Math.random() * 10 + 1),
+    };
+    // Inserindo no vetor
+    items.push(item);
   }
 
-  simulated_annnealing(){
-    const Items = this.preecherObjeto();
-    
+  return items;
+}
+
+function getTamMochila(){
+  const mochila = document.getElementById('schoolbag').value;
+  const Mochila = parseFloat(mochila);
+  return Mochila;
+}
+
+function calcularTotalPeso(solucao) {
+  let totalPeso = 0;
+  const items = getItem();
+  for (let i = 0; i < solucao.length; i++) {
+    if (solucao[i] === 1) {
+      totalPeso += items[i].peso;
+    }
   }
-  printarItens(){
-    const aux = this.preecherObjeto();
-    console.log(aux);
+  return totalPeso;
+}
+
+// Função para calcular o valor total de uma solução
+function calcularTotalValor(solucao) {
+  let totalValor = 0;
+  const items = getItem();
+  for (let i = 0; i < solucao.length; i++) {
+    if (solucao[i] === 1) {
+      totalValor += items[i].valor;
+    }
   }
-  gerarGrafico(){
-    let data = {
-      labels: [ 10, 20, 30, 50, 50, 60, 70, 80 , 90, 100],
+  return totalValor;
+}
+
+// Função para verificar se uma solução é válida
+function eSolucaoValida(solucao) {
+  const totalPeso = calcularTotalPeso(solucao);
+  const Mochila = getTamMochila();
+  return totalPeso <= Mochila;
+}
+
+// Função para gerar uma solução inicial aleatória
+function gerarRandomSolucao() {
+  const solucao = [];
+  const items = getItem();
+  for (let i = 0; i < items.length; i++) {
+    solucao.push(Math.round(Math.random()));
+  }
+  return solucao;
+}
+
+// Função de probabilidade de aceitação de soluções piores
+function probabilidadeDeAceitacao(delta, temperatura) {
+  return Math.exp(delta / temperatura);
+}
+
+// Função para executar o algoritmo Simulated Annealing
+function simulatedAnnealing() {
+  let solucaoAceita = gerarRandomSolucao();
+  let melhorSol = solucaoAceita.slice();
+  let atualTemp = tempIni;
+  let numIntera = 0;
+  let histErro = [];
+  
+
+  while (atualTemp > tempFinal && numIntera < limiteInte) {
+    const novaSol = solucaoAceita.slice();
+
+    // Decisão aleatória para adicionar ou remover um item
+    const decisao = Math.round(Math.random());
+    if (decisao === 0) {
+      // Remover um item aleatório
+      const removeIndex = Math.floor(Math.random() * novaSol.length);
+      if (novaSol[removeIndex] === 1) {
+        novaSol[removeIndex] = 0;
+      }
+    } else {
+      // Adicionar um item aleatório
+      const addIndex = Math.floor(Math.random() * novaSol.length);
+      if (novaSol[addIndex] === 0 && eSolucaoValida(novaSol)) {
+        novaSol[addIndex] = 1;
+      }
+    }
+
+    const situacaoAtual = calcularTotalValor(solucaoAceita);
+    const novaSituacao = calcularTotalValor(novaSol);
+
+    if (
+      novaSituacao > situacaoAtual ||
+      probabilidadeDeAceitacao(novaSituacao - situacaoAtual, atualTemp) >
+        Math.random()
+    ) {
+      solucaoAceita = novaSol.slice();
+    }
+
+    if (novaSituacao > calcularTotalValor(melhorSol)) {
+      melhorSol = novaSol.slice();
+    }
+
+    const error = Math.abs(
+      calcularTotalValor(melhorSol) - calcularTotalValor(solucaoAceita)
+    );
+    histErro.push(error);
+
+    atualTemp *= refrigeracao;
+    numIntera++;
+  }
+
+  return {
+    melhorSol,
+    histErro,
+  };
+}
+
+// Função para imprimir os itens selecionados na mochila
+function printSelectedItems(solucao) {
+  let pesoTotal = 0;
+  let valorTotal = 0;
+  const itemSeleci = [];
+  const items = getItem();
+  for (let i = 0; i < solucao.length; i++) {
+    if (solucao[i] === 1) {
+      const item = items[i];
+      pesoTotal += item.peso;
+      valorTotal += item.valor;
+      itemSeleci.push(item);
+    }
+  }
+
+  console.log('Itens selecionados na mochila:');
+  for (let i = 0; i < itemSeleci.length; i++) {
+    const item = itemSeleci[i];
+    console.log(`- Item ${i + 1}: Peso ${item.peso}, Valor ${item.valor}`);
+  }
+  console.log(`Peso total: ${pesoTotal}`);
+  console.log(`Valor total: ${valorTotal}`);
+}
+
+// Função principal que será executada quando o botão for apertado
+function main() {
+  // Executar o algoritmo Simulated Annealing
+  const result = simulatedAnnealing();
+  // Imprimir os itens selecionados na mochila
+  printSelectedItems(result.melhorSol);
+  // Gráfico de Erro
+  const errorChartCtx = document.getElementById('myChart').getContext('2d');
+
+  new Chart(errorChartCtx, {
+    type: 'line',
+    data: {
+      labels: Array.from({ length: result.histErro.length }, (_, i) => i + 1),
       datasets: [
         {
-          label: 'Simulated-Annealing',
-          data: [3, 4,1 ,31, 100],
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 3,
+          label: 'Erro',
+          data: result.histErro,
+          borderColor: 'red',
+          backgroundColor: 'rgba(0, 0, 255, 0.1)',
+          fill: true,
         },
       ],
-    };
-  
-    let options = {
+    },
+    options: {
+      responsive: true,
+      title: {
+        display: true,
+        text: 'Evolução do Erro no Simulated Annealing',
+      },
       scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Iteração',
+          },
+        },
         y: {
-          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Erro',
+          },
         },
       },
-    };
-  
-    // Obter o elemento canvas
-    let canvas = document.getElementById('myChart');
-    let ctx = canvas.getContext('2d');
-  
-    // Criar o gráfico
-    let chart = new Chart(ctx, {
-      type: 'line',
-      data: data,
-      options: options,
-    }); 
-  }
+    },
+  });
 }
-
-function main(){
-  //Pegando os valores do input
-const Mochila = document.getElementById('schoolbag').value;
-//Pegando os valores do input
-const Items = document.getElementById('items').value;
-//Pegando a quantidade de itens
-const pesoMochila = parseFloat(Mochila);
-//Transformando em Inteiros
-const items = parseInt(Items);
-
-
-console.log(pesoMochila, items);
-  const s = new Simulated(pesoMochila, items);
-  s.gerarGrafico();
-  s.printarItens();
-}
-
-function printar(){
-  main();
-}
-
