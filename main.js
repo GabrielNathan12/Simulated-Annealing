@@ -1,27 +1,28 @@
-// Função para calcular o peso total de uma solução
+// Variáveis de temperatura, resfriamento e limite de iterações
 const tempIni = 100;
 const tempFinal = 0.1;
 const refrigeracao = 0.95;
 const limiteInte = 1000;
+
+var items = [];
 
 function getItem(){
   const qtdItens = document.getElementById('items').value;
   // Transformando em inteiros
   const Items = parseInt(qtdItens);
 
-  // Criacao do vetor de items
-  const items = [];
-
-  // Criacao dos items com valores e pesos aleatorios
-  for (let i = 0; i < Items; i++) {
-    const item = {
-      valor: Math.round(Math.random() * 10 + 1),
-      peso: Math.round(Math.random() * 10 + 1),
-    };
-    // Inserindo no vetor
-    items.push(item);
+  if (items.length == 0) {
+    // Criacao dos items com valores e pesos aleatorios
+    for (let i = 0; i < Items; i++) {
+      const item = {
+        valor: Math.round(Math.random() * 10 + 1),
+        peso: Math.round(Math.random() * 10 + 1),
+      };
+      // Inserindo no vetor
+      items.push(item);
+    }
   }
-
+  
   return items;
 }
 
@@ -68,6 +69,9 @@ function gerarRandomSolucao() {
   for (let i = 0; i < items.length; i++) {
     solucao.push(Math.round(Math.random()));
   }
+  while(!eSolucaoValida(solucao)){
+    solucao[Math.floor(Math.random() * solucao.length)] = 0;
+  }
   return solucao;
 }
 
@@ -83,7 +87,6 @@ function simulatedAnnealing() {
   let atualTemp = tempIni;
   let numIntera = 0;
   let histErro = [];
-  
 
   while (atualTemp > tempFinal && numIntera < limiteInte) {
     const novaSol = solucaoAceita.slice();
@@ -99,30 +102,33 @@ function simulatedAnnealing() {
     } else {
       // Adicionar um item aleatório
       const addIndex = Math.floor(Math.random() * novaSol.length);
-      if (novaSol[addIndex] === 0 && eSolucaoValida(novaSol)) {
+      if (novaSol[addIndex] === 0) {
         novaSol[addIndex] = 1;
       }
     }
 
-    const situacaoAtual = calcularTotalValor(solucaoAceita);
-    const novaSituacao = calcularTotalValor(novaSol);
+    if (eSolucaoValida(novaSol)) {
+      const situacaoAtual = calcularTotalValor(solucaoAceita);
+      const novaSituacao = calcularTotalValor(novaSol);
 
-    if (
-      novaSituacao > situacaoAtual ||
-      probabilidadeDeAceitacao(novaSituacao - situacaoAtual, atualTemp) >
-        Math.random()
-    ) {
-      solucaoAceita = novaSol.slice();
+      if (
+        novaSituacao > situacaoAtual ||
+        (novaSituacao < situacaoAtual &&
+          probabilidadeDeAceitacao(novaSituacao - situacaoAtual, atualTemp) >
+            Math.random())
+      ) {
+        solucaoAceita = novaSol.slice();
+      }
+
+      if (novaSituacao > calcularTotalValor(melhorSol)) {
+        melhorSol = novaSol.slice();
+      }
+
+      const error = Math.abs(
+        calcularTotalValor(melhorSol) - calcularTotalValor(solucaoAceita)
+      );
+      histErro.push(error);
     }
-
-    if (novaSituacao > calcularTotalValor(melhorSol)) {
-      melhorSol = novaSol.slice();
-    }
-
-    const error = Math.abs(
-      calcularTotalValor(melhorSol) - calcularTotalValor(solucaoAceita)
-    );
-    histErro.push(error);
 
     atualTemp *= refrigeracao;
     numIntera++;
@@ -158,16 +164,21 @@ function printSelectedItems(solucao) {
   console.log(`Valor total: ${valorTotal}`);
 }
 
+var chart;
 // Função principal que será executada quando o botão for apertado
 function main() {
+  items = [];
   // Executar o algoritmo Simulated Annealing
   const result = simulatedAnnealing();
   // Imprimir os itens selecionados na mochila
   printSelectedItems(result.melhorSol);
   // Gráfico de Erro
+  if(chart){
+    chart.destroy();
+  }
   const errorChartCtx = document.getElementById('myChart').getContext('2d');
 
-  new Chart(errorChartCtx, {
+  chart = new Chart(errorChartCtx, {
     type: 'line',
     data: {
       labels: Array.from({ length: result.histErro.length }, (_, i) => i + 1),
