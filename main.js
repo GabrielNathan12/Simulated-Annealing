@@ -146,6 +146,9 @@ function printSelectedItems(solucao) {
   let valorTotal = 0;
   const itemSeleci = [];
   const items = getItem();
+  const result = document.getElementById('result-container');
+  result.innerHTML = '';
+
   for (let i = 0; i < solucao.length; i++) {
     if (solucao[i] === 1) {
       const item = items[i];
@@ -155,11 +158,24 @@ function printSelectedItems(solucao) {
     }
   }
 
-  console.log('Itens selecionados na mochila:');
+  const titulo = document.createElement('h2');
+  titulo.textContent = 'Itens da mochila';
+  result.appendChild(titulo);
+
   for (let i = 0; i < itemSeleci.length; i++) {
     const item = itemSeleci[i];
-    console.log(`- Item ${i + 1}: Peso ${item.peso}, Valor ${item.valor}`);
+    const itemInfo = document.createElement('p');
+    itemInfo.innerHTML = `Item ${i + 1}  : Peso ${item.peso} , Valor ${item.valor}`;
+    result.appendChild(itemInfo);
   }
+  const pesoTotalInfo = document.createElement('p');
+  pesoTotalInfo.textContent = `Peso total da mochila: ${pesoTotal}`
+  result.appendChild(pesoTotalInfo);
+
+  const valorTotalInfo = document.createElement('p');
+  valorTotalInfo.textContent = `Valor total dos items: ${valorTotal}`;
+  result.appendChild(valorTotalInfo);
+
   console.log(`Peso total: ${pesoTotal}`);
   console.log(`Valor total: ${valorTotal}`);
 }
