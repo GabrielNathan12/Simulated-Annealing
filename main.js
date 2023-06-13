@@ -4,7 +4,7 @@ const tempFinal = 0.1;
 const refrigeracao = 0.95;
 const limiteInte = 1000;
 
-var items = [];
+let items = [];
 
 function getItem(){
   const qtdItens = document.getElementById('items').value;
@@ -91,7 +91,7 @@ function simulatedAnnealing() {
   while (atualTemp > tempFinal && numIntera < limiteInte) {
     const novaSol = solucaoAceita.slice();
 
-    // Decisão aleatória para adicionar ou remover um item
+    // Decisão aleatória para adicionar ou remover um item da mochila
     const decisao = Math.round(Math.random());
     if (decisao === 0) {
       // Remover um item aleatório
@@ -141,7 +141,7 @@ function simulatedAnnealing() {
 }
 
 // Função para imprimir os itens selecionados na mochila
-function printSelectedItems(solucao) {
+function printElementos(solucao) {
   let pesoTotal = 0;
   let valorTotal = 0;
   const itemSeleci = [];
@@ -159,13 +159,13 @@ function printSelectedItems(solucao) {
   }
 
   const titulo = document.createElement('h2');
-  titulo.textContent = 'Itens da mochila';
+  titulo.textContent = 'Itens selecionados da Mochila';
   result.appendChild(titulo);
 
   for (let i = 0; i < itemSeleci.length; i++) {
     const item = itemSeleci[i];
     const itemInfo = document.createElement('p');
-    itemInfo.innerHTML = `Item ${i + 1}  : Peso ${item.peso} , Valor ${item.valor}`;
+    itemInfo.innerHTML = `Item : Peso ${item.peso} , Valor ${item.valor}`;
     result.appendChild(itemInfo);
   }
   const pesoTotalInfo = document.createElement('p');
@@ -180,14 +180,14 @@ function printSelectedItems(solucao) {
   console.log(`Valor total: ${valorTotal}`);
 }
 
-var chart;
+let chart;
 // Função principal que será executada quando o botão for apertado
 function main() {
   items = [];
   // Executar o algoritmo Simulated Annealing
   const result = simulatedAnnealing();
   // Imprimir os itens selecionados na mochila
-  printSelectedItems(result.melhorSol);
+  printElementos(result.melhorSol);
   // Gráfico de Erro
   if(chart){
     chart.destroy();
@@ -202,7 +202,7 @@ function main() {
         {
           label: 'Erro',
           data: result.histErro,
-          borderColor: 'red',
+          borderColor: 'rgba(0,127,255, 1)',
           backgroundColor: 'rgba(0, 0, 255, 0.1)',
           fill: true,
         },
